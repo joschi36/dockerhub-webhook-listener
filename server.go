@@ -20,7 +20,6 @@ type HubMessage struct {
 	}
 
 	Push_data struct {
-		PushedAt int `json:"pushed_at"`
 		Images   []string
 		Pusher   string
 	}
@@ -28,14 +27,14 @@ type HubMessage struct {
 
 type Config struct {
 	ListenAddr string
-	Mailgun    mailGunConfig
 	Tls        struct {
 		Key  string
 		Cert string
 	}
-	Apikeys struct {
+	Apikeys    struct {
 		Key []string
 	}
+	Rancher    rancherConfig
 }
 
 var ServerConfig *Config
