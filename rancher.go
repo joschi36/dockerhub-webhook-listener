@@ -358,10 +358,10 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 			log.Print("# ERR:", err)
 		}
 		if pollstatus == false {
-			log.Print("# Waiting for upgrade to complete (try %v of 10)...", i)
+			log.Print("# Waiting for upgrade to complete (try ", i, " of 10)...")
 			time.Sleep(minute)
 		} else {
-			log.Print("# Upgrade success.")
+			log.Print("# Upgraded service. Finishing...")
 			finishUpgrade(r)
 			dockerHubCallback(hubMsg)
 			break
