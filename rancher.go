@@ -41,6 +41,7 @@ type rancherService struct {
 			Setservicelinks   string `json:"setservicelinks"`
 			Update            string `json:"update"`
 			Upgrade           string `json:"upgrade"`
+			FinishUpgrade			string `json:"finishupgrade"`
 		} `json:"actions"`
 		AssignServiceIPAddress bool        `json:"assignServiceIpAddress"`
 		CreateIndex            int         `json:"createIndex"`
@@ -346,7 +347,7 @@ func (r *Rancher) Call(hubMsg HubMessage) {
   }
   defer resp.Body.Close()
 
-	log.Print("# Sent upgrade request: %v", resp.StatusCode)
+	log.Print("# Sent upgrade request: ", resp.StatusCode)
 
 	minute := time.Minute
 
@@ -361,6 +362,7 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 			time.Sleep(minute)
 		} else {
 			log.Print("# Upgrade success.")
+			finishUpgrade(r)
 		}
 	}
 
@@ -392,17 +394,18 @@ func getService(r *Rancher) rancherService {
 
 	err = json.Unmarshal(body, &ranchersvc)
 	if err != nil {
-		log.Print("error unmarshaling Rancher JSON response:", err)
+		log.Print("error unmarshaling Rancher JSON response: ", err)
 	}
 
 	return ranchersvc
 }
 
 func getUpgradeStatus(r *Rancher, url string) (status bool, err error) {
-	user := r.rancherConfig.UserKey
-	pass := r.rancherConfig.SecretKey
+	//user := r.rancherConfig.UserKey
+	//pass := r.rancherConfig.SecretKey
+	var ranchersvc = getService(r)
 
-	req, err := http.NewRequest("GET", url, nil)
+	/*req, err := http.NewRequest("GET", url, nil)
 
 	req.SetBasicAuth(user, pass)
 	req.Header.Set("Accept", "application/json")
@@ -421,24 +424,46 @@ func getUpgradeStatus(r *Rancher, url string) (status bool, err error) {
 
 	err = json.Unmarshal(body, &ranchersvc)
 	if err != nil {
-		log.Print("error unmarshaling Rancher JSON response:", err)
-	}
+		log.Print("error unmarshaling Rancher JSON response: ", err)
+	}*/
 
 	upgradestatus := ranchersvc.Data[0].State
 
 	if upgradestatus == "upgrading" {
 		status := false
-		return
+		return status, err
 	} else if upgradestatus == "upgraded" {
 		status := true
-		return
+		return status, err
 	} else {
 		err = fmt.Errorf("Rancher state '%v' not of supported type (upgrading or upgraded). Check Rancher for additional information.")
 		status := false
-		return
+		return status, err
 	}
 }
 
-func finishUpgrade(r *Rancher) bool {
+func finishUpgrade(r *Rancher) {
+	ranchersvc := getService(r)
+	url := ranchersvc.Data[0].Actions.FinishUpgrade
+	user := r.rancherConfig.UserKey
+	pass := r.rancherConfig.SecretKey
 
+	req, err := http.NewRequest("POST", url, nil)
+
+	req.SetBasicAuth(user, pass)
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+  resp, err := client.Do(req)
+  if err != nil {
+    panic(err)
+  }
+
+	if resp.StatusCode == 202 {
+		log.Print("# Finished Upgrade.")
+	} else {
+		log.Print("# Unknown Upgrade Status: ", resp.StatusCode)
+	}
+
+	return
 }
