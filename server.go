@@ -9,6 +9,7 @@ import (
 var msgHandlers Registry
 
 type HubMessage struct {
+	CallbackUrl string `json:"callback_url"`
 	Repository struct {
 		Status    string
 		RepoUrl   string `json:"repo_url"`
@@ -18,7 +19,6 @@ type HubMessage struct {
 		StarCount int    `json:"star_count"`
 		RepoName  string `json:"repo_name"`
 	}
-
 	Push_data struct {
 		Images   []string
 		Pusher   string
