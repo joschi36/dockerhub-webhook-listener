@@ -6,7 +6,7 @@ import (
 
 	"github.com/scalingdata/gcfg"
 
-	server ".."
+	server "github.com/ThatsNinja/dockerhub-webhook-listener"
 )
 
 var listenAddr = flag.String("listen", "localhost:8080", "<address>:<port> to listen on")

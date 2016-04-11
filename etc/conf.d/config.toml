@@ -1,0 +1,10 @@
+[template]
+src = "config.ini.tmpl"
+dest = "/tmp/config.ini"
+keys = [
+    "/api/key",
+    "/rancher/url",
+    "/rancher/user/key",
+    "/rancher/secret/key",
+    "/rancher/service"
+]
