@@ -41,7 +41,7 @@ type rancherService struct {
 			Setservicelinks   string `json:"setservicelinks"`
 			Update            string `json:"update"`
 			Upgrade           string `json:"upgrade"`
-			FinishUpgrade			string `json:"finishupgrade"`
+			FinishUpgrade     string `json:"finishupgrade"`
 		} `json:"actions"`
 		AssignServiceIPAddress bool        `json:"assignServiceIpAddress"`
 		CreateIndex            int         `json:"createIndex"`
@@ -304,7 +304,7 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 	var ranchersvc = getService(r)
 	lc, _ := json.Marshal(ranchersvc.Data[0].LaunchConfig)
 	slc, _ := json.Marshal(ranchersvc.Data[0].SecondaryLaunchConfigs)
-  url := ranchersvc.Data[0].Actions.Upgrade
+	url := ranchersvc.Data[0].Actions.Upgrade
 	user := r.rancherConfig.UserKey
 	pass := r.rancherConfig.SecretKey
 
@@ -325,13 +325,13 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 
 	var jsonStr = []byte(`{"inServiceStrategy":` +
 		`{` +
-			`"batchSize": 1,` +
-	    `"intervalMillis": 2000,` +
-	    `"startFirst": false,` +
-	    `"launchConfig":` + string(lc) + `,` +
-	    `"secondaryLaunchConfigs":` + string(slc) +
+		`"batchSize": 1,` +
+		`"intervalMillis": 2000,` +
+		`"startFirst": false,` +
+		`"launchConfig":` + string(lc) + `,` +
+		`"secondaryLaunchConfigs":` + string(slc) +
 		`}` +
-	`}`)
+		`}`)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 
@@ -339,12 +339,12 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
-  client := &http.Client{}
-  resp, err := client.Do(req)
-  if err != nil {
-    panic(err)
-  }
-  defer resp.Body.Close()
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
 	log.Print("# Sent upgrade request: ", resp.StatusCode)
 
@@ -382,13 +382,13 @@ func getService(r *Rancher) rancherService {
 	req.Header.Set("Accept", "application/json")
 
 	client := &http.Client{}
-  resp, err := client.Do(req)
-  if err != nil {
-    panic(err)
-  }
-  defer resp.Body.Close()
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
-  body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 
 	var ranchersvc rancherService
 
@@ -430,10 +430,10 @@ func finishUpgrade(r *Rancher) {
 	req.Header.Set("Accept", "application/json")
 
 	client := &http.Client{}
-  resp, err := client.Do(req)
-  if err != nil {
-    panic(err)
-  }
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
 
 	if resp.StatusCode == 202 {
 		log.Print("# Finished Upgrade.")
@@ -457,17 +457,17 @@ func dockerHubCallback(hubMsg HubMessage) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 
 	client := &http.Client{}
-  resp, err := client.Do(req)
-  if err != nil {
-    panic(err)
-  }
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
 
 	switch resp.StatusCode {
-		case 202:
-			log.Print("# Callback to Docker Hub Webhook complete: ", resp.StatusCode)
-		case 200:
-			log.Print("# Callback to Docker Hub Webhook complete: ", resp.StatusCode)
-		default:
-			log.Print("# Unacceptable Docker Hub Webhook Callback Status: ", resp.StatusCode)
+	case 202:
+		log.Print("# Callback to Docker Hub Webhook complete: ", resp.StatusCode)
+	case 200:
+		log.Print("# Callback to Docker Hub Webhook complete: ", resp.StatusCode)
+	default:
+		log.Print("# Unacceptable Docker Hub Webhook Callback Status: ", resp.StatusCode)
 	}
 }
