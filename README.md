@@ -14,11 +14,11 @@ You **must** supply these environment variables to start the app listening:
 
 | Environment Variable | Purpose |
 | -------------------- | ------- |
-| api_key              | API Key to use when calling the app (supply as request param in Docker Hub config) |
-| rancher_url          | The URL if your Rancher Server API root (e.g. http://myrancher.example.com:8080/v1/projects/1a2) |
-| rancher_user_key     | The API Access Key (create via 'API' in the Rancher console) |
-| rancher_secret_key   | The API Secret Key |
-| rancher_service      | The name of the rancher service you'd like to upgrade |
+| `api_key`              | API Key to use when calling the app (supply as request param in Docker Hub config) |
+| `rancher_url`          | The URL if your Rancher Server API root (e.g. http://myrancher.example.com:8080/v1/projects/1a2) |
+| `rancher_user_key`     | The API Access Key (create via 'API' in the Rancher console) |
+| `rancher_secret_key`   | The API Secret Key |
+| `rancher_service`      | The name of the rancher service you'd like to upgrade |
 
 Test locally, thus:
 ```bash
