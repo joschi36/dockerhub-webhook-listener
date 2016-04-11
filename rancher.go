@@ -332,8 +332,6 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 		`}` +
 	`}`)
 
-	log.Print("# request Body: ", string(jsonStr))
-
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 
 	req.SetBasicAuth(user, pass)
@@ -359,10 +357,13 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 			log.Print("# ERR:", err)
 		}
 		if pollstatus == false {
+			log.Print("# Waiting for upgrade to complete (try %v of 10)...", i)
 			time.Sleep(minute)
 		} else {
 			log.Print("# Upgrade success.")
 			finishUpgrade(r)
+			dockerHubCallback(hubMsg)
+			break
 		}
 	}
 
@@ -401,31 +402,7 @@ func getService(r *Rancher) rancherService {
 }
 
 func getUpgradeStatus(r *Rancher, url string) (status bool, err error) {
-	//user := r.rancherConfig.UserKey
-	//pass := r.rancherConfig.SecretKey
 	var ranchersvc = getService(r)
-
-	/*req, err := http.NewRequest("GET", url, nil)
-
-	req.SetBasicAuth(user, pass)
-	req.Header.Set("Accept", "application/json")
-
-	client := &http.Client{}
-  resp, err := client.Do(req)
-  if err != nil {
-    panic(err)
-  }
-
-  defer resp.Body.Close()
-
-  body, _ := ioutil.ReadAll(resp.Body)
-
-	var ranchersvc rancherService
-
-	err = json.Unmarshal(body, &ranchersvc)
-	if err != nil {
-		log.Print("error unmarshaling Rancher JSON response: ", err)
-	}*/
 
 	upgradestatus := ranchersvc.Data[0].State
 
@@ -436,7 +413,7 @@ func getUpgradeStatus(r *Rancher, url string) (status bool, err error) {
 		status := true
 		return status, err
 	} else {
-		err = fmt.Errorf("Rancher state '%v' not of supported type (upgrading or upgraded). Check Rancher for additional information.")
+		err = fmt.Errorf("Rancher state '%v' not of supported type (upgrading or upgraded). Check Rancher for additional information.", upgradestatus)
 		status := false
 		return status, err
 	}
@@ -466,4 +443,29 @@ func finishUpgrade(r *Rancher) {
 	}
 
 	return
+}
+
+func dockerHubCallback(hubMsg) {
+	url := hubMsg.CallbackUrl
+
+	var jsonStr = []byte(`{
+		"state": "success",
+    "description": "Rancher Deployment Successful",
+    "context":      "Rancher Deployment",
+    "target_url":   ""
+	}`)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+
+	client := &http.Client{}
+  resp, err := client.Do(req)
+  if err != nil {
+    panic(err)
+  }
+
+	if resp.StatusCode == 202 {
+		log.Print("# Callback to Docker Hub Webhook complete.")
+	} else {
+		log.Print("# Unknown Docker Hub Webhook Callback Status: ", resp.StatusCode)
+	}
 }
