@@ -317,6 +317,7 @@ func (r *Rancher) Call(hubMsg HubMessage) {
 			return
 		} else if svcstatus == "upgraded" {
 			log.Print("# Attempting to complete in-progress upgrade...")
+			finishUpgrade(r)
 		}
 	} else {
 		log.Print("# API URL: ", url)
@@ -374,8 +375,6 @@ func getService(r *Rancher) rancherService {
 	url := r.rancherConfig.Url + "/services?name=" + r.rancherConfig.Service
 	user := r.rancherConfig.UserKey
 	pass := r.rancherConfig.SecretKey
-
-	log.Print("SERVICE REQUEST URL: ", url)
 
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -445,7 +444,7 @@ func finishUpgrade(r *Rancher) {
 	return
 }
 
-func dockerHubCallback(hubMsg) {
+func dockerHubCallback(hubMsg HubMessage) {
 	url := hubMsg.CallbackUrl
 
 	var jsonStr = []byte(`{
@@ -463,9 +462,12 @@ func dockerHubCallback(hubMsg) {
     panic(err)
   }
 
-	if resp.StatusCode == 202 {
-		log.Print("# Callback to Docker Hub Webhook complete.")
-	} else {
-		log.Print("# Unknown Docker Hub Webhook Callback Status: ", resp.StatusCode)
+	switch resp.StatusCode {
+		case 202:
+			log.Print("# Callback to Docker Hub Webhook complete: ", resp.StatusCode)
+		case 200:
+			log.Print("# Callback to Docker Hub Webhook complete: ", resp.StatusCode)
+		default:
+			log.Print("# Unacceptable Docker Hub Webhook Callback Status: ", resp.StatusCode)
 	}
 }
