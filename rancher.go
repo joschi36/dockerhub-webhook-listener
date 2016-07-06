@@ -69,7 +69,7 @@ type rancherService struct {
 			DNSSearch                    []interface{} `json:"dnsSearch"`
 			DomainName                   interface{}   `json:"domainName"`
 			Environment                  struct {
-				APIHOST string `json:"API_HOST"`
+				CONFIGFILE string `json:"CONFIGFILE"`
 			} `json:"environment"`
 			Hostname  interface{} `json:"hostname"`
 			ImageUUID string      `json:"imageUuid"`
@@ -148,7 +148,7 @@ type rancherService struct {
 					DNSSearch                    []interface{} `json:"dnsSearch"`
 					DomainName                   interface{}   `json:"domainName"`
 					Environment                  struct {
-						APIHOST string `json:"API_HOST"`
+						CONFIGFILE string `json:"CONFIGFILE"`
 					} `json:"environment"`
 					Hostname  interface{} `json:"hostname"`
 					ImageUUID string      `json:"imageUuid"`
@@ -198,7 +198,7 @@ type rancherService struct {
 					DNSSearch                    []interface{} `json:"dnsSearch"`
 					DomainName                   interface{}   `json:"domainName"`
 					Environment                  struct {
-						APIHOST string `json:"API_HOST"`
+						CONFIGFILE string `json:"CONFIGFILE"`
 					} `json:"environment"`
 					Hostname  interface{} `json:"hostname"`
 					ImageUUID string      `json:"imageUuid"`
